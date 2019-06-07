@@ -11,16 +11,7 @@ const bcryptSettings = {
 
 /* GET home page. */
 router.get('/', (req, res) => {
-  res.render('index', { title: 'Express' });
-});
-
-router.get('/signin', (req, res) => {
-  if (req.isAuthenticated()) {
-    res.status(res.statusCode).json({'isAuthenticated': req.isAuthenticated(), 'id': req.user['id']});
-  }
-  else {
-    res.sendFile('signIn.html', { root: path.join(__dirname, '../public/html') })
-  }
+  res.json({'status': 'live'});
 });
 
 router.post('/signin', passport.authenticate('local', {
@@ -30,7 +21,7 @@ router.post('/signin', passport.authenticate('local', {
 
 router.get('/signout', (req, res) => {
   req.logout();
-  res.redirect('/signin');
+  res.redirect('/status');
 });
 
 router.post('/idcheck', (req, res) => {
@@ -44,18 +35,16 @@ router.post('/idcheck', (req, res) => {
   });
 });
 
-router.get('/signup', (req, res) => {
-   res.sendFile('signUp.html', { root: path.join(__dirname, '../public/html') });
-});
-
 router.post('/signup', (req, res) => {
   bcyrpt.hash(req.body['pw'], bcryptSettings.saltRounds, (err, hash) => {
     Users.signUp(req.body['id'], hash);
+    res.status(res.statusCode).json({'test': 'test'});
   });
 });
 
 router.get('/status', (req, res) => {
-  res.status(res.statusCode).json({'isAuthenticated': req.isAuthenticated(), 'id': req.user['id']});
+  console.log({'isAuthenticated': req.isAuthenticated(), 'id': (req.isAuthenticated() ? req.user['id'] : null)});
+  res.status(res.statusCode).json({'isAuthenticated': req.isAuthenticated(), 'id': (req.isAuthenticated() ? req.user['id'] : null)});
 });
 
 module.exports = router;
